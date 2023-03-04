@@ -26,32 +26,38 @@ socketio = SocketIO(socksyServer)
 eventlet.monkey_patch()
 
 def flask_thread(debug, host, port):
-	"""
+    """
 
 
-	:param debug: True to enable debug mode in server
-	:param host: the ip address of the host
-	:param port: the port number to start the server on
-	:return: None
-	"""
-	socketio.run(socksyServer, debug=debug, host=host, port=port)
+    :param debug: True to enable debug mode in server
+    :param host: the ip address of the host
+    :param port: the port number to start the server on
+    :return: None
+    """
+    socketio.run(socksyServer, debug=debug, host=host, port=port)
 
 
 @socketio.on('connect')
 def test_connect():
-	print("socket connected")
+    print("socket connected")
 
+@socketio.on('disconnect')
+def test_disconnect():
+    print('socket disconnected')
+
+@socketio.on('message')
+def handle_message(data):
+    print('received message: ' + data)
 
 if __name__ == '__main__':
-	print(f'starting Socksy Server...')
+    print(f'starting Socksy Server...')
 
-	# Get hostname and ip address
-	hostname = socket.gethostname()
-	ipAddress = socket.gethostbyname(hostname)
-	hostPort = 6000
-	print(f'Hostname: {hostname} with IP address: {ipAddress}')
+    # Get hostname and ip address
+    hostname = socket.gethostname()
+    ipAddress = socket.gethostbyname(hostname)
+    hostPort = 6000
+    print(f'Hostname: \'{hostname}\' with IP address: \'{ipAddress}\'')
 
-	# Run Flask app with SocketIO wrapper. Set host with static IP
-	flaskApp = threading.Thread(target=flask_thread(
-		True, ipAddress, hostPort))
-	flaskApp.start()
+    # Run Flask app with SocketIO wrapper. Set host with static IP
+    flaskApp = threading.Thread(target=flask_thread(True, ipAddress, hostPort))
+    flaskApp.start()
