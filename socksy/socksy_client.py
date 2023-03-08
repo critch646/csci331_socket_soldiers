@@ -11,20 +11,43 @@ import sys
 import threading
 import time
 import socket
+import asyncio
 
+# Third-party Imports
 import socketio
 
-sio = socketio.Client(logger=True, engineio_logger=True)
-sio.connect('http://127.0.1.1:6000')
+socketio = socketio.Client()
 
-sio.emit('message', {'from': 'client'})
+@socketio.on('my_message')
+def on_message(data):
+	print('I received a message: ', data)
+
+@socketio.event
+def connect():
+	print('I am connected!')
 
 
+@socketio.event
+def connect_error(data):
+	print('Connection Error: ', data)
 
-@sio.on('response')
-def response(data):
-    print(data)  # {'from': 'server'}
 
-    sio.disconnect()
-    exit(0)
+def socksy_authenticate(username, password):
+	socketio.emit('socksy_authenticate', data=(username, password))
+
+@socketio.event
+def disconnect():
+	print('Disconnected')
+
+
+if __name__ == '__main__':
+	socketio.connect('http://localhost:6000')
+	print('my sid is', socketio.sid)
+	socketio.emit('my_message', {'foo': 'bar'})
+	username = os.getlogin()
+	time.sleep(1)
+	socksy_authenticate(username, 'Orange55')
+
+	socketio.disconnect()
+
 

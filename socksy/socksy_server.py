@@ -41,20 +41,29 @@ def flask_thread(debug, host, port):
 def test_connect():
     print("socket connected")
 
+@socketio.on('socksy_authenticate')
+def handle_socksy_authenticate(username, password):
+    print(f'socksy_authenticate, username: {username}, password: {password}')
+
 @socketio.on('disconnect')
 def test_disconnect():
     print('socket disconnected')
 
 @socketio.on('message')
 def handle_message(data):
-    print('received message: ' + data)
+    print('received message: ', data)
+
+@socketio.on('my_message')
+def handle_my_message(data):
+    print('my_message: ', data)
 
 if __name__ == '__main__':
     print(f'starting Socksy Server...')
 
     # Get hostname and ip address
     hostname = socket.gethostname()
-    ipAddress = socket.gethostbyname(hostname)
+    # ipAddress = socket.gethostbyname(hostname)
+    ipAddress = '127.0.0.1'
     hostPort = 6000
     print(f'Hostname: \'{hostname}\' with IP address: \'{ipAddress}\'')
 
