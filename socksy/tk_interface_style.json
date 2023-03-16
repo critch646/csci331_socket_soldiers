@@ -1,0 +1,18 @@
+{
+    "fg": "white",
+    "bg": "#263238",
+    "width": 1000,
+    "height": 600,
+    "message_frame_style": {
+        "fg": "white",
+        "bg": "#263238"
+    },
+    "message_input_box_style": {
+        "fg": "white",
+        "bg": "#263238",
+        "input_box_style": {
+            "fg": "white",
+            "bg": "grey25"
+        }
+    }
+}
