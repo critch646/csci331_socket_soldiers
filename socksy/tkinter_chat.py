@@ -1,15 +1,48 @@
 import os
 import datetime as dt
+import threading
 import tkinter as tk
 from pathlib import Path
 
 import pyjson5
+import socketio
+
+import getpass
+
 
 from modules.chat_data import Message, User
 
+socketio = socketio.Client()
+
+@socketio.on('my_message')
+def on_message(data):
+    print('I received a message: ', data)
+
+@socketio.event
+def connect():
+    print('I am connected!')
+
+
+@socketio.event
+def connect_error(data):
+    print('Connection Error: ', data)
+
+
+def socksy_emit_authenticate(username, password):
+    socketio.emit('socksy_authenticate', data=(username, password))
+
+@socketio.event
+def disconnect():
+    print('Disconnected')
+
+@socketio.on('message')
+def handle_message(data):
+    print('received message: ', data)
+
+
 
 # set up initial state
-USERNAME = os.getlogin()
+USERNAME = getpass.getuser() # Even Python suggest not using getlogin()
 CURRENT_USER = User(USERNAME, dt.datetime.now())
 
 user_dict = {
@@ -182,8 +215,16 @@ class MessageInputFrame(tk.Frame):
         self.input_box.delete("1.0", tk.END)
         return content
 
+def socketio_connect_thread(coonectionString: str):
+
+    print('Attempting to connect socketio')
+    socketio.connect(coonectionString)
+
 
 if __name__ == '__main__':
+    socketio_connection = threading.Thread(target=socketio_connect_thread, args='http://localhost:6000')
+    socketio_connection.start()
+
     style_data = {}
 
     style_file = Path().cwd() / 'socksy' / 'tk_interface_style.json'
@@ -199,3 +240,5 @@ if __name__ == '__main__':
     root.update()
 
     root.mainloop()
+
+

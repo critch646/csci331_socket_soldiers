@@ -40,6 +40,9 @@ def disconnect():
 	print('Disconnected')
 
 
+
+
+
 if __name__ == '__main__':
 	socketio.connect('http://localhost:6000')
 	print('my sid is', socketio.sid)

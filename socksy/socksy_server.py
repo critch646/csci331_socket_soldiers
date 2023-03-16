@@ -11,6 +11,7 @@ import sys
 import threading
 import time
 import socket
+import random
 
 # Third-party imports
 from flask import Flask, request, redirect, render_template
@@ -46,7 +47,7 @@ def handle_socksy_authenticate(username, password):
     print(f'socksy_authenticate, username: {username}, password: {password}')
 
 @socketio.on('disconnect')
-def test_disconnect():
+def handle_disconnect():
     print('socket disconnected')
 
 @socketio.on('message')
@@ -57,6 +58,15 @@ def handle_message(data):
 def handle_my_message(data):
     print('my_message: ', data)
 
+def test_emit_message():
+    print('test_emit_message thread started.')
+
+    while True:
+        time.sleep(10 + random.randint(0, 5))
+        socketio.emit('message', f'Here is a random int: {random.randint(1, 1024)}')
+        print('message sent')
+
+
 if __name__ == '__main__':
     print(f'starting Socksy Server...')
 
@@ -66,6 +76,11 @@ if __name__ == '__main__':
     ipAddress = '127.0.0.1'
     hostPort = 6000
     print(f'Hostname: \'{hostname}\' with IP address: \'{ipAddress}\'')
+
+
+
+    testEmitMessageThread = threading.Thread(target=test_emit_message)
+    testEmitMessageThread.start()
 
     # Run Flask app with SocketIO wrapper. Set host with static IP
     flaskApp = threading.Thread(target=flask_thread(True, ipAddress, hostPort))
