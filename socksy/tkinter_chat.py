@@ -36,8 +36,12 @@ def disconnect():
     print('Disconnected')
 
 @socketio.on('message')
-def handle_message(data):
-    print('received message: ', data)
+def handle_socket_message(username, datetime, msg):
+    print(f'{username}@{datetime}: {msg}')
+
+
+def send_socket_message(username, msg, datetime):
+    socketio.emit('message', data=(username, datetime, msg))
 
 
 
@@ -215,14 +219,14 @@ class MessageInputFrame(tk.Frame):
         self.input_box.delete("1.0", tk.END)
         return content
 
-def socketio_connect_thread(coonectionString: str):
+def socketio_connect_thread(connectionStr: str):
 
     print('Attempting to connect socketio')
-    socketio.connect(coonectionString)
+    socketio.connect(connectionStr)
 
 
 if __name__ == '__main__':
-    socketio_connection = threading.Thread(target=socketio_connect_thread, args='http://localhost:6000')
+    socketio_connection = threading.Thread(target=socketio_connect_thread, args=['http://localhost:6000'])
     socketio_connection.start()
 
     style_data = {}
