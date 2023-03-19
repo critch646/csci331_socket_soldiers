@@ -1,7 +1,6 @@
-# Terminal Interface
+# Tkinter Interface
 
-Run with: `python socksy/curses_chat_window.py`
+We've settled on using Tkinter for our application user interface. 
 
 ## Controls
-- `:msg <message>`: Send new message in the channel
-- `:exit`: Quit the program and return to the terminal
+- `<Enter>`: Send contents of message entry box as a message

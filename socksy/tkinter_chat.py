@@ -14,9 +14,11 @@ from modules.chat_data import Message, User
 
 socketio = socketio.Client()
 
+
 @socketio.on('my_message')
 def on_message(data):
     print('I received a message: ', data)
+
 
 @socketio.event
 def connect():
@@ -31,9 +33,11 @@ def connect_error(data):
 def socksy_emit_authenticate(username, password):
     socketio.emit('socksy_authenticate', data=(username, password))
 
+
 @socketio.event
 def disconnect():
     print('Disconnected')
+
 
 @socketio.on('message')
 def handle_socket_message(username, datetime, msg):
@@ -44,9 +48,8 @@ def send_socket_message(username, msg, datetime):
     socketio.emit('message', data=(username, datetime, msg))
 
 
-
 # set up initial state
-USERNAME = getpass.getuser() # Even Python suggest not using getlogin()
+USERNAME = getpass.getuser()  # Even Python suggest not using getlogin()
 CURRENT_USER = User(USERNAME, dt.datetime.now())
 
 user_dict = {
@@ -61,7 +64,11 @@ messages = [
     Message("Hi Alice.",    user_dict['bob'],      "10:33am"),
     Message("How are you?", user_dict['alice'],    "10:33am"),
     Message("I'm good, thanks.", user_dict['bob'], "10:33am"),
-    Message("bye", user_dict['bob'], "10:33am")
+    Message("bye", user_dict['bob'], "10:33am"),
+    Message(";(", user_dict['bob'], "10:33am"),
+    Message("bye", user_dict['bob'], "10:33am"),
+    Message("bye", user_dict['bob'], "10:33am"),
+    Message("bye", user_dict['bob'], "10:33am"),
 ]
 
 
@@ -71,28 +78,26 @@ class Root(tk.Tk):
     """
 
     def set_from_json(self, style: dict):
+        class Style:
+            pass
+        self.style = Style()
         DEFAULT_STYLE = {
-            "fg": "white",
-            "bg": "#263238",
-            "width": 600,
-            "height": 400,
-            "message_frame_style": {
-                "fg": "white",
-                "bg": "#263238"
-            },
-            "message_input_box_style": {
-                "fg": "white",
-                "bg": "white",
-                "input_box_style": {
-                    "fg": "black",
-                    "bg": "white"
-                }
-            }
+            "light_shades": "#1c1c1c",
+            "light_accent": "white",
+            "light_primary": "white",
+            "dark_accent": "grey5",
+            "dark_shades": "grey25",
+            "width": 1000,
+            "height": 600,
+            "primary_font": ["consolas", 15, "normal"],
+            "bold_font": ["consolas", 15, "bold"],
         }
+
         for key, val in DEFAULT_STYLE.items():
             DEFAULT_STYLE[key] = style.get(key, val)
+            self.style.__setattr__(key, DEFAULT_STYLE[key])
 
-        self.__dict__.update(**DEFAULT_STYLE)
+        # self.style.__dict__.update(**DEFAULT_STYLE)
 
     def __init__(self, style):
 
@@ -100,110 +105,118 @@ class Root(tk.Tk):
 
         # set instance variables from JSon
         self.set_from_json(style)
-        self.configure(bg=self.bg)
-        self.geometry(f"{self.width}x{self.height}")
+        self.configure(bg=self.style.dark_shades)
+        self.geometry(f"{self.style.width}x{self.style.height}")
         # self.resizable(0, 0)
 
-        self.message_frame = MessageFrame(self, self.message_frame_style)
-        self.message_input_frame = MessageInputFrame(self, self.message_input_box_style, self.send_input_msg)
+        self.message_frame = MessageFrame(self, self.style)
+        self.message_input_frame = MessageInputFrame(self, self.style, self.send_input_msg)
 
-        self.message_frame.pack(fill="both", expand=True, padx=10, pady=10)
-        self.message_input_frame.pack(fill='x', expand=True, anchor='s', padx=10, pady=10)
+        # sticky = 'nwes' means that the widget will expand to fill the entire cell
+        self.message_frame.grid(row=0, column=0, sticky='nwes', padx=10, pady=10)
+        self.message_input_frame.grid(row=1, column=0, sticky='nwes', padx=10, pady=10)
+
+        self.rowconfigure(0, weight=9)
+        self.rowconfigure(1, weight=1)
+        self.columnconfigure(0, weight=1)
 
         self.bind('<Return>', self.message_input_frame.enter_key_pressed)
 
     def send_input_msg(self):
-        message_content = self.message_input_frame.retrieve_and_clear()
+        message_content = self.message_input_frame.pop_entry_content()
         if message_content and not message_content.isspace():
             message = Message(message_content, CURRENT_USER, dt.datetime.now())
+
+            # TODO: Should send to server instead of just adding to message list
             self.message_frame.add_msg(message)
 
 
 class MessageFrame(tk.Frame):
 
-    def set_from_json(self, style: dict):
-        DEFAULT_STYLE = {
-            "fg": "white",
-            "bg": "#263238"
-        }
-        for key, val in DEFAULT_STYLE.items():
-            DEFAULT_STYLE[key] = style.get(key, val)
-
-        self.__dict__.update(**DEFAULT_STYLE)
-
-    def __init__(self, parent, style: dict, messages: list[Message] = [], refresh_command=None):
+    def __init__(self, parent, style: dict, messages: list[Message] = [], refresh_command=None, **kwargs):
         self.parent = parent
-        self.set_from_json(style)
-        tk.Frame.__init__(self, self.parent, bg=self.bg)
+        self.style = style
+        tk.Frame.__init__(self, self.parent, bg=self.style.dark_shades, **kwargs)
 
         self.refresh_command = refresh_command
 
-        # display all flashcard sets for selection
-        self.scrollable_item_selection = tk.Frame(self, width=400, height=600, bg='white')
-        self.scrollable_canvas = tk.Canvas(self.scrollable_item_selection, bg=self.bg, highlightthickness=0, width=400)
-        self.item_selection_scrollbar = tk.Scrollbar(self.scrollable_item_selection, orient='vertical',
-                                                     command=self.scrollable_canvas.yview, bg=self.bg)
+        self.msg_list = tk.Listbox(self,
+                                   relief='flat',
+                                   highlightthickness=0,
+                                   bg=self.style.dark_shades,
+                                   fg=self.style.light_primary,
+                                   selectbackground=self.style.dark_shades,
+                                   selectforeground=self.style.light_primary,
+                                   font=self.style.primary_font)
 
-        # create a frame for the scrollable items to exist in and bind it to a command which changes their position as the scrollbar moves
-        self.scrollable_items_frame = tk.Frame(self.scrollable_canvas, width=0, height=0, bg=self.bg)
-        self.scrollable_items_frame.bind("<Configure>", lambda e: self.scrollable_canvas.configure(scrollregion=self.scrollable_canvas.bbox("all")))
-
-        # set up the scrolling canvas in the
-        self.scrollable_canvas.create_window((0, 0), window=self.scrollable_items_frame, anchor="nw")
-        self.scrollable_canvas.config(yscrollcommand=self.item_selection_scrollbar.set)
-
-        self.msg_labels = []
+        self.scrollbar = tk.Scrollbar(self, orient='vertical', command=self.msg_list.yview)
+        self.scrollbar.pack(side='right', fill='y')
+        
+        self.msg_list.config(yscrollcommand=self.scrollbar.set)
+        self.msg_list.pack(side=tk.LEFT, fill="both", expand=True)
 
         self.messages = messages
         self.update_msgs()
 
     def update_msgs(self):
+        """ Updates the messages in the message frame
+        New single messages can be added with the add_msg method
+        """
+        self.clear()
         for msg in self.messages:
-            self.add_msg(msg)
+            self.add_entry(str(msg))
+
+    def add_entry(self, entry: str):
+        """ Adds a string to the message frame
+
+        Args:
+            entry (str): String to be added to the message frame
+        """
+        self.msg_list.insert(tk.END, entry)
+        self.msg_list.yview_moveto(1)
 
     def add_msg(self, msg: Message):
-        msg_label = tk.Label(self,
-                             text=str(msg),
-                             foreground='white',
-                             bg=self.bg,
-                             font=('consolas', 15, 'normal')
-                             )
-        msg_label.grid(row=len(self.msg_labels), column=0, sticky=tk.W)
-        self.msg_labels.append(msg_label)
+        """ Adds a message to the message frame
+
+        Args:
+            msg (Message): Message to be added to the message frame
+        """
+        self.msg_list.insert(tk.END, str(msg))
+        self.msg_list.yview_moveto(1)
+        self.messages.append(msg)
+        
+    def clear(self):
+        self.msg_list.delete(0, "end")
 
 
 class MessageInputFrame(tk.Frame):
 
-    def set_from_json(self, style: dict):
-        DEFAULT_STYLE = {
-            "fg": "white",
-            "bg": "white",
-            "input_box_style": {
-                "fg": "black",
-                "bg": "white"
-            }
-        }
-        for key, val in DEFAULT_STYLE.items():
-            DEFAULT_STYLE[key] = style.get(key, val)
-
-        self.__dict__.update(**DEFAULT_STYLE)
-
     def __init__(self, parent, style: dict, send_button_command):
         self.parent = parent
         self.send_button_command = send_button_command
-        self.set_from_json(style)
-        tk.Frame.__init__(self, self.parent, bg=self.bg)
+        self.style = style
+        tk.Frame.__init__(self, self.parent, bg=self.style.dark_accent)
 
         self.text = tk.StringVar()
 
-        self.input_box = tk.Text(self, height=1, fg=self.input_box_style['fg'], bg=self.input_box_style['bg'],
-                                 insertbackground=self.input_box_style['fg'],
-                                 font=('consolas', 15, 'normal'))
+        self.input_box = tk.Text(self,
+                                 height=1,
+                                 fg=self.style.light_accent,
+                                 bg=self.style.dark_shades,
+                                 insertbackground=self.style.light_primary,
+                                 font=self.style.primary_font,
+                                 highlightthickness=1)
 
-        self.send_button = tk.Button(self, text='>', width=5, foreground='white', background='grey25', command=self.send_button_press,
-                                     font=('consolas', 15, 'bold'))
-        self.input_box.grid(row=0, column=0, sticky='ew', padx=10, pady=10)
-        self.send_button.grid(row=0, column=1, sticky='e', padx=10, pady=10)
+        self.send_button = tk.Button(self,
+                                     text='>',
+                                     width=5,
+                                     foreground=self.style.light_primary,
+                                     background=self.style.dark_shades,
+                                     command=self.send_button_press,
+                                     font=self.style.bold_font,
+                                     highlightthickness=1)
+        self.input_box.grid(row=0, column=0, sticky='w', padx=10, pady=10)
+        self.send_button.grid(row=0, column=1, sticky='we', padx=10, pady=10)
 
         self.columnconfigure(0, weight=8)
         self.columnconfigure(1, weight=2)
@@ -214,10 +227,11 @@ class MessageInputFrame(tk.Frame):
     def send_button_press(self):
         self.send_button_command()
 
-    def retrieve_and_clear(self) -> str:
+    def pop_entry_content(self) -> str:
         content = self.input_box.get("1.0", tk.END)
         self.input_box.delete("1.0", tk.END)
         return content
+
 
 def socketio_connect_thread(connectionStr: str):
 
@@ -244,5 +258,3 @@ if __name__ == '__main__':
     root.update()
 
     root.mainloop()
-
-
