@@ -24,6 +24,8 @@ socksyServer = Flask(__name__)
 socksyServer.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(socksyServer)
 
+DEBUG = True
+
 # Monkey-patch Eventlet (must be global)
 eventlet.monkey_patch()
 
@@ -52,8 +54,9 @@ def handle_disconnect():
     print('socket disconnected')
 
 @socketio.on('message')
-def handle_message(username, msg, datetime):
-    print(f'{username}@{datetime}: {msg}')
+def handle_message(username, msg, datetime, channel):
+    print(f'{username}@{channel} - {datetime}: {msg}')
+    # TODO Brandon, insert message to database
 
 @socketio.on('my_message')
 def handle_my_message(data):
@@ -65,7 +68,7 @@ def test_emit_message():
     while True:
         time.sleep(10 + random.randint(0, 5))
         date_time_now = datetime.datetime.now()
-        socketio.emit('message', ('server', date_time_now.strftime('%m/%d/%Y, %H:%M:%S'), f'Here\'s a new int! {random.randint(1, 1024)}'))
+        socketio.emit('message', ('server', date_time_now.strftime('%m/%d/%Y, %H:%M:%S'), f'Here\'s a new int! {random.randint(1, 1024)}', 'Default'))
         print('message sent')
 
 
@@ -88,8 +91,9 @@ if __name__ == '__main__':
 
 
     testEmitMessageThread = threading.Thread(target=test_emit_message)
-    testEmitMessageThread.start()
+    if DEBUG:
+        testEmitMessageThread.start()
 
     # Run Flask app with SocketIO wrapper. Set host with static IP
-    flaskApp = threading.Thread(target=flask_thread(True, ipAddress, hostPort))
+    flaskApp = threading.Thread(target=flask_thread(DEBUG, ipAddress, hostPort))
     flaskApp.start()

@@ -40,12 +40,14 @@ def disconnect():
 
 
 @socketio.on('message')
-def handle_socket_message(username, datetime, msg):
-    print(f'{username}@{datetime}: {msg}')
+def handle_socket_message(username, datetime, msg, channel):
+    print(f'{username}@{channel} - {datetime}: {msg}')
+    # TODO Ethan, have this update the messages in the View.
 
 
-def send_socket_message(username, msg, datetime):
-    socketio.emit('message', data=(username, datetime, msg))
+def send_socket_message(username, msg, datetime, channel):
+    socketio.emit('message', data=(username, msg, datetime, channel))
+    # TODO Ethan, have this called when the user enters a message.
 
 
 # set up initial state
