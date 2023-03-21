@@ -45,8 +45,8 @@ def handle_socket_message(username, datetime, msg, channel):
     # TODO Ethan, have this update the messages in the View.
 
 
-def send_socket_message(username, msg, datetime, channel):
-    socketio.emit('message', data=(username, msg, datetime, channel))
+def send_socket_message(username, msg, datetime):
+    socketio.emit('message', data=(username, msg, datetime), broadcast=True)
     # TODO Ethan, have this called when the user enters a message.
 
 
