@@ -50,7 +50,7 @@ def handle_socket_message(username, datetime, msg):
 
 
 def send_socket_message(username, msg, datetime):
-    socketio.emit('message', data=(username, msg, datetime))
+    socketio.emit('message', data=(username, msg, datetime), broadcast=True)
     # XXX: This is called when the user presses enter in the input box or clicks the send button
 
 
