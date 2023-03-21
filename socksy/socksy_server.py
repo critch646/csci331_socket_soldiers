@@ -55,7 +55,11 @@ def handle_disconnect():
 
 @socketio.on('message')
 def handle_message(username, msg, datetime, channel):
-    print(f'{username}@{channel} - {datetime}: {msg}')
+
+    t = datetime.datetime.now
+    date_time = t.strftime('%Y/%m/%d %I:%M:%S %p')
+    socketio.emit('message', data=(username, msg, date_time, channel), broadcast=True)
+    print(f'{username}@{channel} - {date_time}: {msg}')
     # TODO Brandon, insert message to database
 
 @socketio.on('my_message')
