@@ -47,15 +47,18 @@ class Message:
             raise ValueError("The given sent_at value did not match a recognized type. Supply either a datetime string or object")
 
     def date_str(self):
-        # TODO: Make this a date
-        return self.sent_at.strftime("%H:%M")
+        """ Returns the date string for the message send date """
+        return self.sent_at.strftime("%Y-%m-%d")
     
     def time_str(self):
+        """Returns the time string for the message send time
+        """
         return self.sent_at.strftime("%H:%M")
-    
-    def datetime_str(self):
-        # TODO: make this a datetime
-        return self.sent_at.strftime("%H:%M")
+
+    def datetime_str(self) -> str:
+        """Returns the datetime string for the message send datetime
+        """
+        return self.sent_at.strftime("%Y-%m-%d-%H:%M")
 
     def __str__(self):
         return f"{self.sender} ({self.time_str()}) - {self.content}"
