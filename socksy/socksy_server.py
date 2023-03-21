@@ -72,12 +72,18 @@ def test_emit_message():
 if __name__ == '__main__':
     print(f'starting Socksy Server...')
 
+    ipAddress = ""
+
     # Get hostname and ip address
-    hostname = socket.gethostname()
-    # ipAddress = socket.gethostbyname(hostname)
-    ipAddress = '127.0.0.1'
+    try:
+        hostname = socket.gethostname()
+        ipAddress = socket.gethostbyname(hostname)
+    except socket.error as e:
+        print(e)
+        ipAddress = '127.0.0.1'
+
     hostPort = 6000
-    print(f'Hostname: \'{hostname}\' with IP address: \'{ipAddress}\'')
+    print(f'IP address: \'{ipAddress}:{hostPort}\'')
 
 
 
