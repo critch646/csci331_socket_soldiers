@@ -54,12 +54,12 @@ def handle_disconnect():
     print('socket disconnected')
 
 @socketio.on('message')
-def handle_message(username, msg, datetime, channel):
+def handle_message(username, msg, date_time):
 
     t = datetime.datetime.now
-    date_time = t.strftime('%Y/%m/%d %I:%M:%S %p')
-    socketio.emit('message', data=(username, msg, date_time, channel), broadcast=True)
-    print(f'{username}@{channel} - {date_time}: {msg}')
+    date_time_now = datetime.datetime.now().strftime('%m/%d/%Y, %H:%M:%S')
+    socketio.emit('message', data=(username, msg, date_time_now), broadcast=True)
+    print(f'{username}@{date_time_now}: {msg}')
     # TODO Brandon, insert message to database
 
 @socketio.on('my_message')
@@ -71,9 +71,10 @@ def test_emit_message():
 
     while True:
         time.sleep(10 + random.randint(0, 5))
-        date_time_now = datetime.datetime.now()
-        socketio.emit('message', ('server', date_time_now.strftime('%m/%d/%Y, %H:%M:%S'), f'Here\'s a new int! {random.randint(1, 1024)}', 'Default'))
-        print('message sent')
+        date_time_now = datetime.datetime.now().strftime('%m/%d/%Y, %H:%M:%S')
+        msg = f'Here\'s a new int! {random.randint(1, 1024)}'
+        socketio.emit('message', ('server', msg, date_time_now))
+        print(f'message sent@{date_time_now}: {msg}')
 
 
 if __name__ == '__main__':
@@ -94,9 +95,9 @@ if __name__ == '__main__':
 
 
 
-    testEmitMessageThread = threading.Thread(target=test_emit_message)
-    if DEBUG:
-        testEmitMessageThread.start()
+    # testEmitMessageThread = threading.Thread(target=test_emit_message)
+    # if DEBUG:
+    #     testEmitMessageThread.start()
 
     # Run Flask app with SocketIO wrapper. Set host with static IP
     flaskApp = threading.Thread(target=flask_thread(DEBUG, ipAddress, hostPort))

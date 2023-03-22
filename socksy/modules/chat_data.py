@@ -34,31 +34,26 @@ class User:
 class Message:
     content: str
     sender: User
-    sent_at: dt.datetime
+    sent_at: str
     
-    def __init__(self, content: str, sender: User, sent_at: Union[dt.datetime, str] = dt.datetime.now()):
+    def __init__(self, content: str, sender: User, sent_at: str = None):
         self.content = content
         self.sender = sender
-        if isinstance(sent_at, dt.datetime):
-            self.sent_at = sent_at
-        elif isinstance(sent_at, str):
-            self.sent_at = parse(sent_at)
-        else:
-            raise ValueError("The given sent_at value did not match a recognized type. Supply either a datetime string or object")
+        self.sent_at = sent_at
 
     def date_str(self):
         """ Returns the date string for the message send date """
-        return self.sent_at.strftime("%Y-%m-%d")
+        return self.sent_at
     
     def time_str(self):
         """Returns the time string for the message send time
         """
-        return self.sent_at.strftime("%H:%M")
+        return self.sent_at
 
     def datetime_str(self) -> str:
         """Returns the datetime string for the message send datetime
         """
-        return self.sent_at.strftime("%Y-%m-%d-%H:%M")
+        return self.sent_at
 
     def __str__(self):
         return f"{self.sender} ({self.time_str()}) - {self.content}"
