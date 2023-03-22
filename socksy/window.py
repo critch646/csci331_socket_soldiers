@@ -1,82 +1,20 @@
-import os
+"""
+Contains the main window for the client
+"""
+
+# Standard library imports
 import datetime as dt
-import queue
 import threading
 import tkinter as tk
 from pathlib import Path
 
+# Third-party Imports
 import pyjson5
 import socketio
 
-import getpass
-
-
+# Local Imports
+import socksy_client
 from modules.chat_data import Message, User
-
-socketio = socketio.Client()
-MESSAGE_QUEUE = queue.Queue()
-
-
-@socketio.on('my_message')
-def on_message(data):
-    print('I received a message: ', data)
-
-
-@socketio.event
-def connect():
-    print('I am connected!')
-
-
-@socketio.event
-def connect_error(data):
-    print('Connection Error: ', data)
-
-
-def socksy_emit_authenticate(username, password):
-    socketio.emit('socksy_authenticate', data=(username, password))
-
-
-@socketio.event
-def disconnect():
-    print('Disconnected')
-
-
-@socketio.on('message')
-def handle_socket_message(username, msg, date_time):
-    print(f'{username} ({date_time}): {msg}')
-    # XXX: Messags are added to the queue here
-    message = Message(msg, username, date_time)
-    MESSAGE_QUEUE.put(message, timeout=3)
-
-
-def send_socket_message(username, msg, date_time):
-    print(f'send_socket_message, username: {username}, msg: {msg}, datetime: {date_time}')
-    socketio.emit('message', data=(username, msg, date_time))
-    # XXX: This is called when the user presses enter in the input box or clicks the send button
-
-
-# set up initial state
-USERNAME = getpass.getuser()  # Even Python suggest not using getlogin()
-CURRENT_USER = User(USERNAME, dt.datetime.now())
-
-user_dict = {
-    'bob': User('Bob', dt.datetime.now()),
-    'alice': User('Alice', dt.datetime.now())
-}
-
-users = list(user_dict.values())
-
-messages = [
-    Message("Hello world!", user_dict['alice'],    "10:33am"),
-    Message("Hi Alice.",    user_dict['bob'],      "10:33am"),
-    Message("How are you?", user_dict['alice'],    "10:33am"),
-    Message("I'm good, thanks.", user_dict['bob'], "10:33am"),
-    Message("bye", user_dict['bob'], "10:33am"),
-    Message(";(", user_dict['bob'], "10:33am"),
-    Message("bye", user_dict['bob'], "10:33am"),
-    Message("bye", user_dict['bob'], "10:33am"),
-    Message("bye", user_dict['bob'], "10:33am"),
-]
 
 
 class Root(tk.Tk):
@@ -131,18 +69,20 @@ class Root(tk.Tk):
 
         self.bind('<Return>', self.message_input_frame.enter_key_pressed)
 
+        self.tick()  # Function that continually checks the queue for new messages
+
     def send_input_msg(self):
         message_content = self.message_input_frame.pop_entry_content()
         if message_content and not message_content.isspace():
-            message = Message(message_content, CURRENT_USER, dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+            message = Message(message_content, socksy_client.CURRENT_USER, dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
             # XXX: Sending message to server here
             self.message_send_command(message.sender.name, message.content, message.sent_at)
             # self.message_frame.add_msg(message)
 
     def tick(self):
-        if not MESSAGE_QUEUE.empty():
-            message = MESSAGE_QUEUE.get(timeout=3)
+        if not socksy_client.MESSAGE_QUEUE.empty():
+            message = socksy_client.MESSAGE_QUEUE.get(timeout=3)
             self.message_frame.add_msg(message)
         self.message_frame.update_msgs()
         self.after(self.tick_interval, self.tick)
@@ -201,7 +141,7 @@ class MessageFrame(tk.Frame):
         self.msg_list.insert(tk.END, str(msg))
         self.msg_list.yview_moveto(1)
         self.messages.append(msg)
-        
+
     def clear(self):
         self.msg_list.delete(0, "end")
 
@@ -267,11 +207,9 @@ if __name__ == '__main__':
         print(f"File {style_file.name} exists. Using its style.")
         with open(style_file, 'r') as fp:
             style_data = pyjson5.decode_io(fp)
-    root = Root(style_data, message_send_command=send_socket_message)
+    root = Root(style_data, message_send_command=socksy_client.send_socket_message)
     root.tick()
     root.lift()
-    root.message_frame.messages = messages
-    root.message_frame.update_msgs()
 
     root.update()
     root.mainloop()
