@@ -62,6 +62,8 @@ def handle_message(username, msg, date_time):
     print(f'{username}@{date_time_now}: {msg}')
     # TODO Brandon, insert message to database
 
+    # create a prepared statement, insert necessary details into the statement, and then push to the database
+
 @socketio.on('my_message')
 def handle_my_message(data):
     print('my_message: ', data)
