@@ -42,15 +42,16 @@ def disconnect():
 
 
 @socketio.on('message')
-def handle_socket_message(username, datetime, msg):
-    print(f'{username} ({datetime}): {msg}')
+def handle_socket_message(username, msg, date_time):
+    print(f'{username} ({date_time}): {msg}')
     # XXX: Messags are added to the queue here
-    message = Message(msg, username, datetime)
+    message = Message(msg, username, date_time)
     MESSAGE_QUEUE.put(message, timeout=3)
 
 
-def send_socket_message(username, msg, datetime):
-    socketio.emit('message', data=(username, msg, datetime), broadcast=True)
+def send_socket_message(username, msg, date_time):
+    print(f'send_socket_message, username: {username}, msg: {msg}, datetime: {date_time}')
+    socketio.emit('message', data=(username, msg, date_time))
     # XXX: This is called when the user presses enter in the input box or clicks the send button
 
 
@@ -133,10 +134,10 @@ class Root(tk.Tk):
     def send_input_msg(self):
         message_content = self.message_input_frame.pop_entry_content()
         if message_content and not message_content.isspace():
-            message = Message(message_content, CURRENT_USER, dt.datetime.now())
+            message = Message(message_content, CURRENT_USER, dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
             # XXX: Sending message to server here
-            self.message_send_command(message.username, message.sent_at, message.content)
+            self.message_send_command(message.sender.name, message.content, message.sent_at)
             # self.message_frame.add_msg(message)
 
     def tick(self):
@@ -267,6 +268,7 @@ if __name__ == '__main__':
         with open(style_file, 'r') as fp:
             style_data = pyjson5.decode_io(fp)
     root = Root(style_data, message_send_command=send_socket_message)
+    root.tick()
     root.lift()
     root.message_frame.messages = messages
     root.message_frame.update_msgs()
