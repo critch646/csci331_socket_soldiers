@@ -89,6 +89,21 @@ class Root(tk.Tk):
 
 
 class MessageFrame(tk.Frame):
+    """ Frame that contains the list of messages
+
+    Attributes:
+        parent (tk.Tk): Parent object
+        style (dict): Dictionary containing styling data for window e.g. colors, fonts
+        refresh_command (function, optional): Function to be called when the message frame is refreshed. Defaults to None.
+        msg_list (tk.Listbox): Listbox that contains the messages
+        scrollbar (tk.Scrollbar): Scrollbar for the message listbox
+        messsages (list[Message]): List of messages to be displayed in the message frame
+        
+    Methods:
+        update_msgs: Clear the message frame and populate it based on current value of self.messages
+        add_msg (Message): Add a message to the message frame. Adds to self.messages and updates the window.
+        clear: Clear all currently displayed messages
+    """
 
     def __init__(self, parent, style: dict, messages: list[Message] = [], refresh_command=None, **kwargs):
         self.parent = parent
@@ -188,28 +203,3 @@ class MessageInputFrame(tk.Frame):
         content = self.input_box.get("1.0", tk.END)
         self.input_box.delete("1.0", tk.END)
         return content
-
-
-def socketio_connect_thread(connectionStr: str):
-
-    print('Attempting to connect socketio')
-    socketio.connect(connectionStr)
-
-
-if __name__ == '__main__':
-    socketio_connection = threading.Thread(target=socketio_connect_thread, args=['http://127.0.0.1:6000'])
-    socketio_connection.start()
-
-    style_data = {}
-
-    style_file = Path().cwd() / 'socksy' / 'tk_interface_style.json'
-    if style_file.exists():
-        print(f"File {style_file.name} exists. Using its style.")
-        with open(style_file, 'r') as fp:
-            style_data = pyjson5.decode_io(fp)
-    root = Root(style_data, message_send_command=socksy_client.send_socket_message)
-    root.tick()
-    root.lift()
-
-    root.update()
-    root.mainloop()
