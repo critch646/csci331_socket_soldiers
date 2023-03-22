@@ -1,0 +1,13 @@
+COMMANDS: ** ARE ONLY ABLE TO BE RUN ON THE CSCI.VIU.CA SERVERS **
+1. creating/destroying a specific table can be done through calling a specific script in the
+'create/' OR 'destroy/' directories!
+e.g.
+> ./create/create_msgtable.sh  # will create ONLY the Messages table (will need the Users table though)
+> ./destroy/destroy_usertable.sh  # will drop ONLY the Users table (will need to drop Messages first)
+
+2. creating/dropping BOTH tables can be done through calling a specific script!
+e.g.
+> ./create_projecttables.sh  # will create BOTH Users, and Messages tables (that order)
+> ./destroy_projecttables.sh  # will drop BOTH Messages, and Users tables (that order)
+
+#EOF
