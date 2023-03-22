@@ -27,11 +27,12 @@ import window
 
 socketio = socketio.Client()
 
+# when a message is received through the socket connection, it is added to this queue
+# the main thread will check this queue and update the GUI
 MESSAGE_QUEUE = queue.Queue()
 
-# set up initial state
 USERNAME = getpass.getuser()  # Even Python suggest not using getlogin()
-CURRENT_USER = User(USERNAME, dt.datetime.now())
+CURRENT_USER = User(USERNAME, dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
 @socketio.on('my_message')
 def on_message(data):
