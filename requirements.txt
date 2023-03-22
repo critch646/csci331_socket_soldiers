@@ -1,2 +1,5 @@
 python-dateutil>=2.8.2
-pyjson5
+pyjson5>=1.6.2
+Flask-SocketIO>=5.3.3
+eventlet>=0.33.3
+python-socketio>=5.8.0
