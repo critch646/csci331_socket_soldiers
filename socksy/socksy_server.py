@@ -1,7 +1,7 @@
 """
+The main entry for the Socksy server.
 
-
-:name: socksy_server
+@name: socksy_server
 """
 
 # Standard library imports
@@ -17,68 +17,44 @@ import random
 # Third-party imports
 from flask import Flask, request, redirect, render_template
 from flask_socketio import SocketIO
-import eventlet
 
-# Initialize Flask and SocketIO (must be global)
-socksyServer = Flask(__name__)
-socksyServer.config['SECRET_KEY'] = 'secret!'
-socketio = SocketIO(socksyServer)
+# Project imports
+from modules.server_socketio import socketio, socksyServer
+from modules.server_socket_handlers import handle_connect, handle_socksy_authenticate, handle_disconnect, handle_message
 
 DEBUG = True
+TEST = False
 
-# Monkey-patch Eventlet (must be global)
-eventlet.monkey_patch()
-
-def flask_thread(debug, host, port):
+def flask_thread(debug: bool, host: str, port: int):
     """
+    Thread function to run the flask socketio server.
 
-
-    :param debug: True to enable debug mode in server
-    :param host: the ip address of the host
-    :param port: the port number to start the server on
-    :return: None
+    @param debug: True if you want to run the server in debug mode.
+    @param host: The host address to run the server with.
+    @param port: The port number to run the server with.
+    @return: None
     """
     socketio.run(socksyServer, debug=debug, host=host, port=port)
 
+def test_emit_message_thread():
+    """
+    For testing. See if connected clients receive messages.
 
-@socketio.on('connect')
-def test_connect():
-    print("socket connected")
+    @return: None
+    """
 
-@socketio.on('socksy_authenticate')
-def handle_socksy_authenticate(username, password):
-    print(f'socksy_authenticate, username: {username}, password: {password}')
-
-@socketio.on('disconnect')
-def handle_disconnect():
-    print('socket disconnected')
-
-@socketio.on('message')
-def handle_message(username, msg, date_time):
-
-    t = datetime.datetime.now
-    date_time_now = datetime.datetime.now().strftime('%m/%d/%Y, %H:%M:%S')
-    socketio.emit('message', data=(username, msg, date_time_now), broadcast=True)
-    print(f'{username}@{date_time_now}: {msg}')
-    # TODO Brandon, insert message to database
-
-@socketio.on('my_message')
-def handle_my_message(data):
-    print('my_message: ', data)
-
-def test_emit_message():
     print('test_emit_message thread started.')
 
-    while True:
+    while TEST:
         time.sleep(10 + random.randint(0, 5))
         date_time_now = datetime.datetime.now().strftime('%m/%d/%Y, %H:%M:%S')
         msg = f'Here\'s a new int! {random.randint(1, 1024)}'
-        socketio.emit('message', ('server', msg, date_time_now))
+        socketio.emit('message', ('server', msg, date_time_now), broadcast=True)
         print(f'message sent@{date_time_now}: {msg}')
 
 
 if __name__ == '__main__':
-    print(f'starting Socksy Server...')
+    print(f'Starting Socksy Server...')
 
     ipAddress = ""
 
@@ -91,13 +67,12 @@ if __name__ == '__main__':
         ipAddress = '127.0.0.1'
 
     hostPort = 6000
-    print(f'IP address: \'{ipAddress}:{hostPort}\'')
+    print(f'Server IP address: \'{ipAddress}:{hostPort}\'')
 
-
-
-    # testEmitMessageThread = threading.Thread(target=test_emit_message)
-    # if DEBUG:
-    #     testEmitMessageThread.start()
+    # Run test message emits to connected clients.
+    if DEBUG and TEST:
+        testEmitMessageThread = threading.Thread(target=test_emit_message_thread)
+        testEmitMessageThread.start()
 
     # Run Flask app with SocketIO wrapper. Set host with static IP
     flaskApp = threading.Thread(target=flask_thread(DEBUG, ipAddress, hostPort))
