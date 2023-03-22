@@ -11,15 +11,15 @@ class DatabaseConnection:
 
     # prepared statements for inserting data
     # INSERT STATEMENTS
-    add_msg_stmt = "INSERT INTO Messages (userID, content, sentAt) VALUES (?,?,?)"
+    add_msg_stmt = "INSERT INTO Messages (username, content, sentAt) VALUES (?,?,?)"
     add_usr_stmt = "INSERT INTO Users (username, permissionLevel) VALUES (?,?)"
 
     # UPDATE STATEMENTS
     make_user_admin_stmt = "UPDATE Users SET permissionLevel = ? WHERE username = ?"
 
     # SELECT STATEMENTS
-    fullpull_msg_stmt = "SELECT userID, content, sentAt FROM Messages ORDER BY sentAt ASC"
-    specpull_msg_stmt = "SELECT userID, content, sentAt FROM Messages WHERE sentAt > ? ORDER BY sentAt ASC"
+    fullpull_msg_stmt = "SELECT username, content, sentAt FROM Messages ORDER BY sentAt ASC"
+    specpull_msg_stmt = "SELECT username, content, sentAt FROM Messages WHERE sentAt > ? ORDER BY sentAt ASC"
 
     def __int__(self):
         # load information from the ENV file
@@ -43,14 +43,14 @@ class DatabaseConnection:
         # Get Cursor
         self.cur = conn.cursor()
 
-    def add_message(self, user_id: str, content: str, sent_at):
+    def add_message(self, username: str, content: str, sent_at):
         """
         :param user_id: string containing the unique identifier for the user
         :param content: string containing the message sent by the user
         :param sent_at: formatted datetime string to be inserted into the database
         :return: None
         """
-        self.cur.execute(self.add_msg_stmt, (user_id, content, sent_at))
+        self.cur.execute(self.add_msg_stmt, (username, content, sent_at))
 
     def add_user(self, username: str) -> None:
         """
