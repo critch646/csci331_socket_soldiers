@@ -1,5 +1,6 @@
 import os
 import datetime as dt
+import queue
 import threading
 import tkinter as tk
 from pathlib import Path
@@ -13,6 +14,7 @@ import getpass
 from modules.chat_data import Message, User
 
 socketio = socketio.Client()
+MESSAGE_QUEUE = queue.Queue()
 
 
 @socketio.on('my_message')
@@ -40,14 +42,16 @@ def disconnect():
 
 
 @socketio.on('message')
-def handle_socket_message(username, datetime, msg, channel):
-    print(f'{username}@{channel} - {datetime}: {msg}')
-    # TODO Ethan, have this update the messages in the View.
+def handle_socket_message(username, datetime, msg):
+    print(f'{username} ({datetime}): {msg}')
+    # XXX: Messags are added to the queue here
+    message = Message(msg, username, datetime)
+    MESSAGE_QUEUE.put(message, timeout=3)
 
 
-def send_socket_message(username, msg, datetime, channel):
-    socketio.emit('message', data=(username, msg, datetime, channel))
-    # TODO Ethan, have this called when the user enters a message.
+def send_socket_message(username, msg, datetime):
+    socketio.emit('message', data=(username, msg, datetime), broadcast=True)
+    # XXX: This is called when the user presses enter in the input box or clicks the send button
 
 
 # set up initial state
@@ -101,9 +105,11 @@ class Root(tk.Tk):
 
         # self.style.__dict__.update(**DEFAULT_STYLE)
 
-    def __init__(self, style):
+    def __init__(self, style, message_send_command, tick_interval: int = 200):
 
         tk.Tk.__init__(self)
+        self.message_send_command = message_send_command
+        self.tick_interval = tick_interval
 
         # set instance variables from JSon
         self.set_from_json(style)
@@ -129,8 +135,16 @@ class Root(tk.Tk):
         if message_content and not message_content.isspace():
             message = Message(message_content, CURRENT_USER, dt.datetime.now())
 
-            # TODO: Should send to server instead of just adding to message list
+            # XXX: Sending message to server here
+            self.message_send_command(message.username, message.sent_at, message.content)
+            # self.message_frame.add_msg(message)
+
+    def tick(self):
+        if not MESSAGE_QUEUE.empty():
+            message = MESSAGE_QUEUE.get(timeout=3)
             self.message_frame.add_msg(message)
+        self.message_frame.update_msgs()
+        self.after(self.tick_interval, self.tick)
 
 
 class MessageFrame(tk.Frame):
@@ -242,7 +256,7 @@ def socketio_connect_thread(connectionStr: str):
 
 
 if __name__ == '__main__':
-    socketio_connection = threading.Thread(target=socketio_connect_thread, args=['http://localhost:6000'])
+    socketio_connection = threading.Thread(target=socketio_connect_thread, args=['http://127.0.0.1:6000'])
     socketio_connection.start()
 
     style_data = {}
@@ -252,11 +266,10 @@ if __name__ == '__main__':
         print(f"File {style_file.name} exists. Using its style.")
         with open(style_file, 'r') as fp:
             style_data = pyjson5.decode_io(fp)
-    root = Root(style_data)
+    root = Root(style_data, message_send_command=send_socket_message)
     root.lift()
     root.message_frame.messages = messages
     root.message_frame.update_msgs()
 
     root.update()
-
     root.mainloop()
