@@ -4,9 +4,8 @@
 
 CREATE TABLE IF NOT EXISTS Users
 (
-    userID SERIAL         PRIMARY KEY,
-    username VARCHAR(30)  NOT NULL
-                        DEFAULT 'guest',
+    username VARCHAR(30)  PRIMARY KEY
+                        NOT NULL,
     createdAt TIMESTAMP   NOT NULL
                         DEFAULT current_timestamp,
     permissionLevel INT   NOT NULL
