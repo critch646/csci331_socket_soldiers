@@ -7,6 +7,7 @@ Flask SocketIO event handlers.
 import datetime
 from flask_socketio import SocketIO
 
+from __main__ import dolphin_db
 from __main__ import socketio
 
 @socketio.on('connect')
@@ -55,7 +56,6 @@ def handle_message(username, msg, date_time):
     date_time_now = datetime.datetime.now().strftime('%m/%d/%Y, %H:%M:%S')
     socketio.emit('message', data=(username, msg, date_time_now), broadcast=True)
     print(f'{username}@{date_time_now}: {msg}')
-    # TODO Brandon, insert message to database
-    # create a prepared statement, insert necessary details into the statement, and then push to the database
+    dolphin_db.add_message(username, msg, date_time_now)
 
 
