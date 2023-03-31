@@ -22,7 +22,7 @@ from flask_socketio import SocketIO
 # Project imports
 from modules.server_socketio import socketio, socksyServer
 from modules.server_socket_handlers import handle_connect, handle_socksy_authenticate, handle_disconnect, handle_message
-from modules.server_mariadb import DatabaseConnection
+from modules.servermariadb import DatabaseConnection
 
 DEBUG = True
 TEST = False
@@ -76,8 +76,8 @@ if __name__ == '__main__':
         testEmitMessageThread = threading.Thread(target=test_emit_message_thread)
         testEmitMessageThread.start()
 
-    # Start database connection for use for server
-    dolphin_db = DatabaseConnection()
+    # # Start database connection for use for server
+    # dolphin_db = DatabaseConnection()
 
     # Run Flask app with SocketIO wrapper. Set host with static IP
     flaskApp = threading.Thread(target=flask_thread(DEBUG, ipAddress, hostPort))
