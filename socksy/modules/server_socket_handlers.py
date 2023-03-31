@@ -7,7 +7,6 @@ Flask SocketIO event handlers.
 import datetime
 from flask_socketio import SocketIO
 
-from __main__ import dolphin_db
 from __main__ import socketio
 
 @socketio.on('connect')
@@ -54,8 +53,10 @@ def handle_message(username, msg, date_time):
 
     t = datetime.datetime.now
     date_time_now = datetime.datetime.now().strftime('%m/%d/%Y, %H:%M:%S')
+
+    # TODO line below seems to now work while the 'broadcast=True' argument is present, when left out-- the server DOES receive the message sent by the client
     socketio.emit('message', data=(username, msg, date_time_now), broadcast=True)
+
     print(f'{username}@{date_time_now}: {msg}')
-    dolphin_db.add_message(username, msg, date_time_now)
 
 

@@ -80,7 +80,7 @@ def socketio_connect_thread(connectionStr: str):
 
 if __name__ == '__main__':
 
-    socketio_connection = threading.Thread(target=socketio_connect_thread, args=['http://127.0.0.1:6000'])
+    socketio_connection = threading.Thread(target=socketio_connect_thread, args=['http://192.168.18.33:6000'])
     socketio_connection.start()
 
     style_data = {}
