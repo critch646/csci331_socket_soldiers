@@ -66,6 +66,7 @@ def handle_message(username, msg, date_time):
     # TODO line below seems to now work while the 'broadcast=True' argument is present, when left out-- the server DOES receive the message sent by the client
     socketio_server.emit('message', data=(username, msg, date_time_now))
 
+    dolphin_db.add_message(username, msg)
     print(f'{username}@{date_time_now}: {msg}')
 
 
