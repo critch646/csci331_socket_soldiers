@@ -7,9 +7,11 @@ Flask SocketIO event handlers.
 import datetime
 from flask_socketio import SocketIO
 
-from __main__ import socketio
+from __main__ import socketio_server
+from .server_socketio import socketio_server
 
-@socketio.on('connect')
+
+@socketio_server.on('connect')
 def handle_connect():
     """
     Triggered when a client connects to the server.
@@ -19,7 +21,8 @@ def handle_connect():
 
     print("socket connected")
 
-@socketio.on('socksy_authenticate')
+
+@socketio_server.on('socksy_authenticate')
 def handle_socksy_authenticate(username, password):
     """
     Triggered when a connected user sends their credentials for authentication
@@ -30,7 +33,8 @@ def handle_socksy_authenticate(username, password):
     """
     print(f'socksy_authenticate, username: {username}, password: {"*" * len(password)}')
 
-@socketio.on('disconnect')
+
+@socketio_server.on('disconnect')
 def handle_disconnect():
     """
     Triggered when a client disconnects.
@@ -40,7 +44,8 @@ def handle_disconnect():
 
     print('Client disconnected')
 
-@socketio.on('message')
+
+@socketio_server.on('message')
 def handle_message(username, msg, date_time):
     """
     Triggered when a client sends a message.
@@ -55,7 +60,7 @@ def handle_message(username, msg, date_time):
     date_time_now = datetime.datetime.now().strftime('%m/%d/%Y, %H:%M:%S')
 
     # TODO line below seems to now work while the 'broadcast=True' argument is present, when left out-- the server DOES receive the message sent by the client
-    socketio.emit('message', data=(username, msg, date_time_now), broadcast=True)
+    socketio_server.emit('message', data=(username, msg, date_time_now))
 
     print(f'{username}@{date_time_now}: {msg}')
 
