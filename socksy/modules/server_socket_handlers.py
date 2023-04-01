@@ -21,10 +21,16 @@ def handle_connect():
     """
     print("socket connected")
     message_history_list = dolphin_db.pull_message_history()
-    # socketio_server.emit('update_message_history', data=message_history_list)
+    serializable_list = []
     for msg in message_history_list:
-        print(msg)
+        msg_dict = {}
+        msg_dict['conent'] = msg.content
+        msg_dict['user'] = msg.sender.name
+        msg_dict['sent_at'] = msg.sent_at
+        serializable_list.append(msg_dict)
 
+    socketio_server.emit('update_message_history', data=serializable_list)
+    print(serializable_list)
 
 @socketio_server.on('socksy_authenticate')
 def handle_socksy_authenticate(username, password):
@@ -63,7 +69,6 @@ def handle_message(username, msg, date_time):
     t = datetime.datetime.now
     date_time_now = datetime.datetime.now().strftime('%m/%d/%Y, %H:%M:%S')
 
-    # TODO line below seems to now work while the 'broadcast=True' argument is present, when left out-- the server DOES receive the message sent by the client
     socketio_server.emit('message', data=(username, msg, date_time_now))
 
     print(f'{username}@{date_time_now}: {msg}')
