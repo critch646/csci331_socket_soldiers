@@ -8,23 +8,25 @@ from datetime import date
 from dotenv import load_dotenv
 from modules.chat_data import *
 
-# prepared statements for inserting data
-# INSERT STATEMENTS
-add_msg_stmt = "INSERT INTO Messages (username, content) VALUES (%s,%s)"
-add_usr_stmt = "INSERT INTO Users (username) VALUES (%s)"
 
-# UPDATE STATEMENTS
-make_user_admin_stmt = "UPDATE Users SET permissionLevel = %s WHERE username = %s"
-
-# SELECT STATEMENTS
-fullpull_msg_stmt = "SELECT content, username, sentAt FROM Messages ORDER BY sentAt ASC"
-specpull_msg_stmt = "SELECT content, username, sentAt FROM Messages WHERE sentAt > %s ORDER BY sentAt ASC"
 
 
 class DatabaseConnection:
     def __init__(self):
         # load information from the ENV file
         load_dotenv('../dolphin.env')
+
+        # prepared statements for inserting data
+        # INSERT STATEMENTS
+        self.add_msg_stmt = "INSERT INTO Messages (username, content) VALUES (%s,%s)"
+        self.add_usr_stmt = "INSERT INTO Users (username) VALUES (%s)"
+
+        # UPDATE STATEMENTS
+        self.make_user_admin_stmt = "UPDATE Users SET permissionLevel = %s WHERE username = %s"
+
+        # SELECT STATEMENTS
+        self.fullpull_msg_stmt = "SELECT content, username, sentAt FROM Messages ORDER BY sentAt ASC"
+        self.specpull_msg_stmt = "SELECT content, username, sentAt FROM Messages WHERE sentAt > %s ORDER BY sentAt ASC"
 
         USERNAME = os.getenv('USERNAME')
         PASSWORD = os.getenv('PASSWORD')
@@ -56,7 +58,7 @@ class DatabaseConnection:
         :return: None
         """
 
-        self.cursor.execute(add_msg_stmt, [message.sender, message.content])
+        self.cursor.execute(self.add_msg_stmt, [message.sender, message.content])
         self.connection.commit()
 
     def add_user(self, user: User) -> None:
@@ -65,7 +67,7 @@ class DatabaseConnection:
         :return: None
         """
 
-        self.cursor.execute(add_usr_stmt, [user.name])
+        self.cursor.execute(self.add_usr_stmt, [user.name])
         self.connection.commit()
 
     def change_user_perms(self, user: User, permission_level: int) -> None:
@@ -78,7 +80,7 @@ class DatabaseConnection:
             if (permission_level < 1) or (permission_level > 5):
                 raise ValueError
             else:
-                self.cursor.execute(make_user_admin_stmt, [permission_level, user.name])
+                self.cursor.execute(self.make_user_admin_stmt, [permission_level, user.name])
                 print(f"user: {user.name} permission level changed to: {permission_level}")
         except ValueError:
             print(f"ValueError: provided value = {permission_level} ... value must be between 1 and 5 (inclusive)")
@@ -91,7 +93,7 @@ class DatabaseConnection:
 
         # if no date is specified, we want to perform a full pull (entire history)
         if days == -1:
-            self.cursor.execute(fullpull_msg_stmt)
+            self.cursor.execute(self.fullpull_msg_stmt)
         else:
             # determines date we need to trace back to
             today = str(date.today()).split('-')                                            # grabs current date
@@ -100,7 +102,7 @@ class DatabaseConnection:
             past_date = formatted_date - time_difference                                    # performs subtraction
             past_date = past_date.strftime('%m/%d/%Y, %H:%M:%S')                            # formats the date for db use
 
-            self.cursor.execute(specpull_msg_stmt, [past_date])
+            self.cursor.execute(self.specpull_msg_stmt, [past_date])
 
         messagehistory = self.cursor.fetchall()
 
