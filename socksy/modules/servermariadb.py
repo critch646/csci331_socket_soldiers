@@ -6,15 +6,12 @@ import datetime
 from datetime import date
 
 from dotenv import load_dotenv
-from modules.chat_data import *
-
-
-
+from .chat_data import Message, User
 
 class DatabaseConnection:
     def __init__(self):
         # load information from the ENV file
-        load_dotenv('../dolphin.env')
+        load_dotenv('dolphin.env')
 
         # prepared statements for inserting data
         # INSERT STATEMENTS
