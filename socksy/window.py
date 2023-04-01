@@ -4,13 +4,8 @@ Contains the main window for the client
 
 # Standard library imports
 import datetime as dt
-import threading
 import tkinter as tk
-from pathlib import Path
-
-# Third-party Imports
-import pyjson5
-import socketio
+from queue import Queue
 
 # Local Imports
 import socksy_client
@@ -44,11 +39,14 @@ class Root(tk.Tk):
 
         # self.style.__dict__.update(**DEFAULT_STYLE)
 
-    def __init__(self, style, message_send_command, tick_interval: int = 200):
+    def __init__(self, style, message_send_command, message_queue: Queue, current_user: User, tick_interval: int = 200):
 
         tk.Tk.__init__(self)
         self.message_send_command = message_send_command
         self.tick_interval = tick_interval
+
+        self.message_queue = message_queue
+        self.current_user = current_user
 
         # set instance variables from JSon
         self.set_from_json(style)
@@ -74,15 +72,15 @@ class Root(tk.Tk):
     def send_input_msg(self):
         message_content = self.message_input_frame.pop_entry_content()
         if message_content and not message_content.isspace():
-            message = Message(message_content, socksy_client.CURRENT_USER, dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+            message = Message(message_content, self.current_user, dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
             # XXX: Sending message to server here
             self.message_send_command(message.sender.name, message.content, message.sent_at)
             # self.message_frame.add_msg(message)
 
     def tick(self):
-        if not socksy_client.MESSAGE_QUEUE.empty():
-            message = socksy_client.MESSAGE_QUEUE.get(timeout=3)
+        if not self.message_queue.empty():
+            message = self.message_queue.get(timeout=3)
             self.message_frame.add_msg(message)
         self.message_frame.update_msgs()
         self.after(self.tick_interval, self.tick)
