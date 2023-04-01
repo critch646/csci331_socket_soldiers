@@ -6,9 +6,6 @@ The main entry for the Socksy server.
 
 # Standard library imports
 import datetime
-import logging.config
-import os
-import sys
 import threading
 import time
 import socket
@@ -19,13 +16,15 @@ import random
 from flask import Flask, request, redirect, render_template
 from flask_socketio import SocketIO
 
+
 # Project imports
-from modules.server_socketio import socketio, socksyServer
+from modules.server_socketio import socketio_server, socksyServer
 from modules.server_socket_handlers import handle_connect, handle_socksy_authenticate, handle_disconnect, handle_message
 from modules.servermariadb import DatabaseConnection
 
 DEBUG = True
 TEST = False
+
 
 def flask_thread(debug: bool, host: str, port: int):
     """
@@ -36,7 +35,8 @@ def flask_thread(debug: bool, host: str, port: int):
     @param port: The port number to run the server with.
     @return: None
     """
-    socketio.run(socksyServer, debug=debug, host=host, port=port)
+    socketio_server.run(socksyServer, debug=debug, host=host, port=port)
+
 
 def test_emit_message_thread():
     """
@@ -51,7 +51,7 @@ def test_emit_message_thread():
         time.sleep(10 + random.randint(0, 5))
         date_time_now = datetime.datetime.now().strftime('%m/%d/%Y, %H:%M:%S')
         msg = f'Here\'s a new int! {random.randint(1, 1024)}'
-        socketio.emit('message', ('server', msg, date_time_now), broadcast=True)
+        socketio_server.emit('message', ('server', msg, date_time_now), broadcast=True)
         print(f'message sent@{date_time_now}: {msg}')
 
 
