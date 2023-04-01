@@ -20,10 +20,14 @@ import datetime as dt
 # Third-party Imports
 import socketio
 import pyjson5
+from dotenv import load_dotenv
 
 # Local Imports
 from modules.chat_data import Message, User
 import window
+
+load_dotenv('socksy/client.env')
+assert os.environ.get('SERVER_HOSTNAME', None) is not None, 'SERVER_HOSTNAME must be set in socksy/.env.user'
 
 socketio = socketio.Client()
 
@@ -60,6 +64,7 @@ def disconnect():
 
 @socketio.on('message')
 def handle_socket_message(username, msg, date_time):
+    global MESSAGE_QUEUE
     print(f'{username} ({date_time}): {msg}')
     # XXX: Messags are added to the queue here
     message = Message(msg, username, date_time)
@@ -86,7 +91,8 @@ def socketio_connect_thread(connectionStr: str):
 
 if __name__ == '__main__':
 
-    socketio_connection = threading.Thread(target=socketio_connect_thread, args=['http://192.168.18.43:6000'])
+    hostname = os.environ.get('SERVER_HOSTNAME', '127.0.0.1')
+    socketio_connection = threading.Thread(target=socketio_connect_thread, args=[f'http://{hostname}:6000'])
     socketio_connection.start()
 
     style_data = {}
@@ -96,7 +102,7 @@ if __name__ == '__main__':
         print(f"File {style_file.name} exists. Using its style.")
         with open(style_file, 'r') as fp:
             style_data = pyjson5.decode_io(fp)
-    root = window.Root(style_data, message_send_command=send_socket_message)
+    root = window.Root(style_data, message_send_command=send_socket_message, message_queue=MESSAGE_QUEUE, current_user=CURRENT_USER)
     root.lift()  # Tells OS to bring window to front
 
     root.update()  # This is required to make the GUI appear
