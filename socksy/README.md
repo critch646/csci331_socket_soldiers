@@ -12,4 +12,4 @@
 
 ### Run Client
 
-- `python socksy/tkinter_chat.py`
+- `python socksy/socksy_client.py`
