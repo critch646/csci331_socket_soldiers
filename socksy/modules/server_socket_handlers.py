@@ -8,6 +8,7 @@ import datetime
 from flask_socketio import SocketIO
 
 from __main__ import socketio_server
+from __main__ import dolphin_db
 from .server_socketio import socketio_server
 
 
@@ -18,8 +19,10 @@ def handle_connect():
 
     @return: None
     """
-
     print("socket connected")
+    message_history_list = dolphin_db.pull_message_history()
+    socketio_server.emit('update_message_history', data=message_history_list)
+
 
 
 @socketio_server.on('socksy_authenticate')
