@@ -26,7 +26,13 @@ from dotenv import load_dotenv
 from modules.chat_data import Message, User
 import window
 
-load_dotenv('socksy/client.env')
+if Path('socksy/.env.user').exists():
+    load_dotenv('socksy/client.env')
+elif Path('client.env').exists():
+    load_dotenv('client.env')
+else:
+    raise FileNotFoundError('client.env not found')
+
 assert os.environ.get('SERVER_HOSTNAME', None) is not None, 'SERVER_HOSTNAME must be set in socksy/.env.user'
 
 socketio = socketio.Client()
