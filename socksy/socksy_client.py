@@ -66,6 +66,12 @@ def handle_socket_message(username, msg, date_time):
     MESSAGE_QUEUE.put(message, timeout=3)
 
 
+@socketio.on('update_message_history')
+def handle_socket_update_message_history(messages):
+    print('handle_socket_update_message_history')
+    for msg in messages:
+        print(msg)
+
 def send_socket_message(username, msg, date_time):
     print(f'send_socket_message, username: {username}, msg: {msg}, datetime: {date_time}')
     socketio.emit('message', data=(username, msg, date_time))
