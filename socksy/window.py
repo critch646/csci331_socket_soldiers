@@ -67,6 +67,7 @@ class Root(tk.Tk):
 
         self.bind('<Return>', self.message_input_frame.enter_key_pressed)
 
+        self.message_frame.update_msgs()
         self.tick()  # Function that continually checks the queue for new messages
 
     def send_input_msg(self):
@@ -82,7 +83,7 @@ class Root(tk.Tk):
         if not self.message_queue.empty():
             message = self.message_queue.get(timeout=3)
             self.message_frame.add_msg(message)
-        self.message_frame.update_msgs()
+            self.message_frame.update_msgs()
         self.after(self.tick_interval, self.tick)
 
 
