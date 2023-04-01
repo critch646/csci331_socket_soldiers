@@ -26,7 +26,7 @@ from dotenv import load_dotenv
 from modules.chat_data import Message, User
 import window
 
-if Path('socksy/.env.user').exists():
+if Path('socksy/client.env').exists():
     load_dotenv('socksy/client.env')
 elif Path('client.env').exists():
     load_dotenv('client.env')
