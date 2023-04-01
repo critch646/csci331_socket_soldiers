@@ -49,7 +49,7 @@ class DatabaseConnection:
 
     def add_message(self, user_id, content):
         """
-        :param user_id: string containing the unique i dentifier for the user
+        :param user_id: string containing the unique identifier for the user
         :param content: string containing the message sent by the user
         :param sent_at: formatted datetime string to be inserted into the database
         :return: None
@@ -107,7 +107,7 @@ class DatabaseConnection:
 
         for item in messagehistory:
             user = User(item[1], "", True)
-            newmsg = Message(item[0], user, item[2])
+            newmsg = Message(item[0], user, item[2].strftime('%m/%d/%Y, %H:%M:%S'))
             messagelist.append(newmsg)
 
         return messagelist
