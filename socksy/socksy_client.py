@@ -89,16 +89,16 @@ def send_socket_message(username, msg, date_time):
     # XXX: This is called when the user presses enter in the input box or clicks the send button
 
 
-def socketio_connect_thread(connectionStr: str):
+def socketio_connect_thread(connectionStr: str, namespaceStr: str):
 
     print('Attempting to connect socketio')
-    socketio.connect(connectionStr)
+    socketio.connect(connectionStr, namespaces=namespaceStr)
 
 
 if __name__ == '__main__':
 
     hostname = os.environ.get('SERVER_HOSTNAME', '127.0.0.1')
-    socketio_connection = threading.Thread(target=socketio_connect_thread, args=[f'http://{hostname}:6000'])
+    socketio_connection = threading.Thread(target=socketio_connect_thread, args=[f'http://{hostname}:6000', '/'])
     socketio_connection.start()
 
     style_data = {}

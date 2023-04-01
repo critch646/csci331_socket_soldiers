@@ -21,8 +21,9 @@ def handle_connect():
     """
     print("socket connected")
     message_history_list = dolphin_db.pull_message_history()
-    socketio_server.emit('update_message_history', data=message_history_list)
-
+    # socketio_server.emit('update_message_history', data=message_history_list)
+    for msg in message_history_list:
+        print(msg)
 
 
 @socketio_server.on('socksy_authenticate')
