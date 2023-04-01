@@ -71,6 +71,7 @@ def handle_message(username, msg, date_time):
 
     socketio_server.emit('message', data=(username, msg, date_time_now))
 
+    dolphin_db.add_message(username, msg)
     print(f'{username}@{date_time_now}: {msg}')
 
 

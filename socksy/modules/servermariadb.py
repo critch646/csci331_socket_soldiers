@@ -47,15 +47,15 @@ class DatabaseConnection:
         self.cursor.close()
         self.connection.close()
 
-    def add_message(self, message: Message):
+    def add_message(self, user_id, content):
         """
-        :param user_id: string containing the unique identifier for the user
+        :param user_id: string containing the unique i dentifier for the user
         :param content: string containing the message sent by the user
         :param sent_at: formatted datetime string to be inserted into the database
         :return: None
         """
 
-        self.cursor.execute(self.add_msg_stmt, [message.sender, message.content])
+        self.cursor.execute(self.add_msg_stmt, [user_id, content])
         self.connection.commit()
 
     def add_user(self, user: User) -> None:
@@ -106,7 +106,8 @@ class DatabaseConnection:
         messagelist = []
 
         for item in messagehistory:
-            newmsg = Message(item[0], item[1], item[2])
+            user = User(item[1], "", True)
+            newmsg = Message(item[0], user, item[2])
             messagelist.append(newmsg)
 
         return messagelist
