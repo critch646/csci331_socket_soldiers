@@ -5,7 +5,7 @@ Flask SocketIO event handlers.
 """
 
 import datetime
-from flask_socketio import SocketIO
+from flask_socketio import SocketIO, Namespace
 
 from __main__ import socketio_server
 from __main__ import dolphin_db
@@ -24,13 +24,13 @@ def handle_connect():
     serializable_list = []
     for msg in message_history_list:
         msg_dict = {}
-        msg_dict['conent'] = msg.content
+        print(msg)
+        msg_dict['content'] = msg.content
         msg_dict['user'] = msg.sender.name
         msg_dict['sent_at'] = msg.sent_at
         serializable_list.append(msg_dict)
-
-    socketio_server.emit('update_message_history', data=serializable_list)
     print(serializable_list)
+    # socketio_server.emit('update_message_history', data=serializable_list)
 
 @socketio_server.on('socksy_authenticate')
 def handle_socksy_authenticate(username, password):
@@ -66,7 +66,6 @@ def handle_message(username, msg, date_time):
     @return:
     """
 
-    t = datetime.datetime.now
     date_time_now = datetime.datetime.now().strftime('%m/%d/%Y, %H:%M:%S')
 
     socketio_server.emit('message', data=(username, msg, date_time_now))

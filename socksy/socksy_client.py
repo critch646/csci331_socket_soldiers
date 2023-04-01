@@ -93,6 +93,8 @@ def socketio_connect_thread(connectionStr: str, namespaceStr: str):
 
     print('Attempting to connect socketio')
     socketio.connect(connectionStr, namespaces=namespaceStr)
+    # socketio.connect(connectionStr)
+
 
 
 if __name__ == '__main__':
