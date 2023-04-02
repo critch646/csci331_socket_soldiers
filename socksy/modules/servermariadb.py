@@ -68,6 +68,7 @@ class DatabaseConnection:
         """
 
         self.cursor.execute(self.check_user_exists_stmt, [username])
+        self.cursor.fetchall()
 
         if self.cursor.rowcount == 0:
             return False
@@ -76,7 +77,7 @@ class DatabaseConnection:
 
     def add_user(self, user: str) -> None:
         """
-        :param username: string containing the unique identifier for the user
+        :param user: string containing the unique identifier for the user
         :return: None
         """
 
