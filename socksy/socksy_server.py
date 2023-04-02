@@ -5,26 +5,19 @@ The main entry for the Socksy server.
 """
 
 # Standard library imports
-import datetime
 import threading
-import time
 import socket
-import random
-
 
 # Third-party imports
 from flask import Flask, request, redirect, render_template
 from flask_socketio import SocketIO
-
 
 # Project imports
 from modules.server_db_connect import dolphin_db
 from modules.server_socketio import socketio_server, socksyServer
 from modules.server_socket_handlers import handle_connect, handle_socksy_authenticate, handle_disconnect, handle_message
 
-
 DEBUG = True
-TEST = False
 
 
 def flask_thread(debug: bool, host: str, port: int):
@@ -41,7 +34,6 @@ def flask_thread(debug: bool, host: str, port: int):
 
 if __name__ == '__main__':
     print(f'Starting Socksy Server...')
-
     ipAddress = ""
 
     # Get hostname and ip address
@@ -53,10 +45,7 @@ if __name__ == '__main__':
         ipAddress = '127.0.0.1'
 
     hostPort = 6000
-    print(f'Server IP address: \'{ipAddress}:{hostPort}\'')
-
-    # # Start database connection for use for server
-    # dolphin_db = DatabaseConnection()
+    print(f'Server address: \'{ipAddress}:{hostPort}\'')
 
     # Run Flask app with SocketIO wrapper. Set host with static IP
     flaskApp = threading.Thread(target=flask_thread(DEBUG, ipAddress, hostPort))
