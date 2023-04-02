@@ -24,13 +24,11 @@ def handle_connect():
     serializable_list = []
     for msg in message_history_list:
         msg_dict = {}
-        print(msg)
         msg_dict['content'] = msg.content
         msg_dict['user'] = msg.sender.name
         msg_dict['sent_at'] = msg.sent_at
         serializable_list.append(msg_dict)
-    print(serializable_list)
-    # socketio_server.emit('update_message_history', data=serializable_list)
+    socketio_server.emit('update_message_history', data=serializable_list)
 
 @socketio_server.on('socksy_authenticate')
 def handle_socksy_authenticate(username, password):
