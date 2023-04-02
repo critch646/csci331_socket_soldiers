@@ -43,7 +43,7 @@ class DatabaseConnection:
             sys.exit(1)
 
         # assign the object's cursor
-        self.cursor = self.connection.cursor()
+        self.cursor = self.connection.cursor(buffered=True)
 
     def __del__(self):
         self.cursor.close()
