@@ -8,6 +8,7 @@ from datetime import date
 from dotenv import load_dotenv
 from .chat_data import Message, User
 
+
 class DatabaseConnection:
     def __init__(self):
         # load information from the ENV file
@@ -17,6 +18,7 @@ class DatabaseConnection:
         # INSERT STATEMENTS
         self.add_msg_stmt = "INSERT INTO Messages (username, content) VALUES (%s,%s)"
         self.add_usr_stmt = "INSERT INTO Users (username) VALUES (%s)"
+        self.check_user_exists_stmt = "SELECT username FROM Users WHERE username = %s"
 
         # UPDATE STATEMENTS
         self.make_user_admin_stmt = "UPDATE Users SET permissionLevel = %s WHERE username = %s"
@@ -58,13 +60,27 @@ class DatabaseConnection:
         self.cursor.execute(self.add_msg_stmt, [user_id, content])
         self.connection.commit()
 
-    def add_user(self, user: User) -> None:
+    def check_user_exists(self, username) -> bool:
+        """
+        Checks if a given username string exists in the database
+        :param username: the string pertaining to the user's username
+        :return: TRUE if exists, FALSE if not
+        """
+
+        self.cursor.execute(self.check_user_exists_stmt, [username])
+
+        if self.cursor.rowcount == 0:
+            return False
+        else:
+            return True
+
+    def add_user(self, user: str) -> None:
         """
         :param username: string containing the unique identifier for the user
         :return: None
         """
 
-        self.cursor.execute(self.add_usr_stmt, [user.name])
+        self.cursor.execute(self.add_usr_stmt, [user])
         self.connection.commit()
 
     def change_user_perms(self, user: User, permission_level: int) -> None:
