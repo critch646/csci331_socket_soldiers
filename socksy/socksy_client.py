@@ -41,6 +41,8 @@ socketio = socketio.Client()
 # the main thread will check this queue and update the GUI
 MESSAGE_QUEUE = queue.Queue()
 
+MESSAGE_HISTORY_FETCHED = False
+
 USERNAME = getpass.getuser()  # Even Python suggest not using getlogin()
 CURRENT_USER = User(USERNAME, dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
@@ -78,10 +80,18 @@ def handle_socket_message(username, msg, date_time):
 
 
 @socketio.on('update_message_history')
-def handle_socket_update_message_history(messages):
-    print('handle_socket_update_message_history')
-    for msg in messages:
-        print(msg)
+def handle_socket_update_message_history(serial_messages):
+    global MESSAGE_HISTORY_FETCHED
+
+    if not MESSAGE_HISTORY_FETCHED:
+        MESSAGE_HISTORY_FETCHED = True
+        global MESSAGE_QUEUE
+        print('handle_socket_update_message_history')
+        messages = []
+        for serial_msg in serial_messages:
+            msg = Message(serial_msg['content'], User(serial_msg['user'], '', True), serial_msg['sent_at'])
+            MESSAGE_QUEUE.put(msg)
+
 
 def send_socket_message(username, msg, date_time):
     print(f'send_socket_message, username: {username}, msg: {msg}, datetime: {date_time}')
