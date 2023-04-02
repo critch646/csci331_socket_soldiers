@@ -11,7 +11,6 @@ from __main__ import socketio_server
 from __main__ import dolphin_db
 from .server_socketio import socketio_server
 
-
 @socketio_server.on('connect')
 def handle_connect():
     """
@@ -31,12 +30,13 @@ def handle_connect():
     socketio_server.emit('update_message_history', data=serializable_list)
 
 @socketio_server.on('socksy_authenticate')
-def handle_socksy_authenticate(username, password):
+def handle_socksy_authenticate(username: str, password: str):
     """
     Triggered when a connected user sends their credentials for authentication
 
     @param username: The username of the connected client.
     @param password: The password of the connected client.
+
     @return: None
     """
     print(f'socksy_authenticate, username: {username}, password: {"*" * len(password)}')
@@ -54,7 +54,7 @@ def handle_disconnect():
 
 
 @socketio_server.on('message')
-def handle_message(username, msg, date_time):
+def handle_message(username: str, msg: str, date_time: str):
     """
     Triggered when a client sends a message.
 
