@@ -10,11 +10,15 @@ from .chat_data import Message, User
 
 
 class DatabaseConnection:
+    """
+    Holds the connection to the dolphin server, as well as the prepared statements for
+    querying the server, and taking, and sending data to and from the server
+    """
     def __init__(self):
         # load information from the ENV file
         load_dotenv('dolphin.env')
 
-        # prepared statements for inserting data
+        # prepared statements for communicating with the database
         # INSERT STATEMENTS
         self.add_msg_stmt = "INSERT INTO Messages (username, content) VALUES (%s,%s)"
         self.add_usr_stmt = "INSERT INTO Users (username) VALUES (%s)"
@@ -46,6 +50,10 @@ class DatabaseConnection:
         self.cursor = self.connection.cursor(buffered=True)
 
     def __del__(self):
+        """
+        Destroys the DatabaseConnection object after we're done with it
+        :return:
+        """
         self.cursor.close()
         self.connection.close()
 
@@ -53,7 +61,6 @@ class DatabaseConnection:
         """
         :param user_id: string containing the unique identifier for the user
         :param content: string containing the message sent by the user
-        :param sent_at: formatted datetime string to be inserted into the database
         :return: None
         """
 
@@ -84,7 +91,7 @@ class DatabaseConnection:
         self.cursor.execute(self.add_usr_stmt, [user])
         self.connection.commit()
 
-    def change_user_perms(self, user: User, permission_level: int) -> None:
+    def change_user_perms(self, username: str, permission_level: int) -> None:
         """
         :param username: string containing the unique identifier for the user
         :param permission_level: int pertaining to the level of permission that the user will be granted
@@ -94,8 +101,8 @@ class DatabaseConnection:
             if (permission_level < 1) or (permission_level > 5):
                 raise ValueError
             else:
-                self.cursor.execute(self.make_user_admin_stmt, [permission_level, user.name])
-                print(f"user: {user.name} permission level changed to: {permission_level}")
+                self.cursor.execute(self.make_user_admin_stmt, [username, str(permission_level)])
+                print(f"user: {username} permission level changed to: {permission_level}")
         except ValueError:
             print(f"ValueError: provided value = {permission_level} ... value must be between 1 and 5 (inclusive)")
 
