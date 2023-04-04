@@ -4,7 +4,7 @@
 
 # Directories
 virtualEnvDir = .venv
-projectDir = project/
+projectDir = socksy/
 
 # Files
 requirementsFile = requirements.txt
