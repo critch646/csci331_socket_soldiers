@@ -1,5 +1,13 @@
 """
-Contains the main window for the client
+Contains the main window for the client.
+Implemented using tkinter.
+
+A message send commend (function), message queue, and current user object are all passed
+into the Root object (main window object). It uses the message queue to display messages
+to the user and uses the message send command to send messages to the server. The current
+user is used for passing the sender when creating a new message object.
+
+@name: window
 """
 
 # Standard library imports
