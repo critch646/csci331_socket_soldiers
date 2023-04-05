@@ -1,7 +1,8 @@
 """
+Runs the chat window and connects to the main socket server (if it is running).
+Gets the hostname of the socket server from `socksy/client.env`.
 
-
-:name: socksy_client
+@name: socksy_server
 """
 
 # Standard library imports

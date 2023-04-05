@@ -1,3 +1,13 @@
+"""
+Unit tests for chat_data module. Tests the User and Message classes.
+
+These are very simple in nature, only testing basic functionality.
+They ensure the classes hold the correct data/methods and that values
+can be grabbed and manipulated as expected.
+
+@name: test_chat_data
+"""
+
 # Third-party imports
 import pytest
 

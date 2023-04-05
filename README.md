@@ -78,18 +78,14 @@ of the Socksy server. A sample of `client.env` is provided below:
 SERVER_HOSTNAME=cub13
 ```
 
-
-## Usage
-By default, we are running the server on the "cub13" VIU CSCI server. You can change this by editing the `socksy_server.py` and `socksy_client.py` files.
-
 1. Run the server: `python3 socksy/socksy_server.py`
 2. Run the client (on the same machine or another CSCI student server): `python3 socksy/socksy_client.py`
 3. Type a message and press enter to send it to the server. The server will then send it to all other connected clients.
 
 
 ### Using the Makefile
-With the supplied `Makefil`, you can run the server with the command 
-`make run_server` and you cna run an instance of the client using 
+With the supplied `Makefile`, you can run the server with the command 
+`make run_server` and you can run an instance of the client using 
 `make run_client`.
 
 
