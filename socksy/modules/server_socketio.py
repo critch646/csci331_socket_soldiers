@@ -1,7 +1,11 @@
 """
 Creates and configures a Flask SocketIO server instance.
 
+Patches Flask's eventlet
+
 @name: server_socketio
+@authors: Zeke Critchlow
+@date: 2023/04/08
 """
 
 from flask import Flask

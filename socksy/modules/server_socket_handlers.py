@@ -1,7 +1,11 @@
 """
 Flask SocketIO event handlers.
 
+Uses Flash socketIO server instance created in `server_socketio.py`
+
 @name: server_socket_handlers.py
+@authors: Zeke Critchlow
+@date: 2023/04/08
 """
 
 import datetime
