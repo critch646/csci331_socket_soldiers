@@ -1,7 +1,9 @@
 """
-The main entry for the Socksy server.
+The main entry point for the Socksy server.
 
-@name: socksy_server
+@name: socksy_server.py
+@author: Zeke Critchlow
+@date: 2023/04/08
 """
 
 # Standard library imports
