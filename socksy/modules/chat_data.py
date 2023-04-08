@@ -1,3 +1,13 @@
+"""
+Data objects for chat application. Currently includes User and Message objects.
+
+These objects don't interact with anything else. They simply hold data.
+
+@name: chat_data
+@author: Ethan Posner
+@Date: 2023/04/08
+"""
+
 from typing import Union
 import datetime as dt
 

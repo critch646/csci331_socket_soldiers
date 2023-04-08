@@ -8,6 +8,8 @@ to the user and uses the message send command to send messages to the server. Th
 user is used for passing the sender when creating a new message object.
 
 @name: window
+@author: Ethan Posner
+@Date: 2023/04/08
 """
 
 # Standard library imports
@@ -130,7 +132,7 @@ class MessageFrame(tk.Frame):
 
         self.scrollbar = tk.Scrollbar(self, orient='vertical', command=self.msg_list.yview)
         self.scrollbar.pack(side='right', fill='y')
-        
+
         self.msg_list.config(yscrollcommand=self.scrollbar.set)
         self.msg_list.pack(side=tk.LEFT, fill="both", expand=True)
 
