@@ -1,0 +1,28 @@
+COMMANDS: ** ARE ONLY ABLE TO BE RUN ON THE CSCI.VIU.CA SERVERS **
+
+# NOTE: to facilitate easier testing, there is an 'unlock.sh' bash script to unlock ''*.sh' files in each
+# directory, please use:
+# > chmod 777 unlock.sh
+# to allow it to execute, and then use:
+# > ./unlock.sh
+# to unlock all .sh files needed for testing/mocking the database.
+
+1. creating/destroying a specific table can be done through:
+
+CREATING TABLES:
+> ./create/create_usertable.sh  # will create ONLY the Messages table (will need the Users table though)
+> ./create/create_msgtable.sh  # will create ONLY the Messages table (will need the Users table though)
+
+DESTROYING TABLES:
+> ./destroy/destroy_msgtable.sh  # will drop ONLY the Users table (will need to drop Messages first)
+> ./destroy/destroy_usertable.sh  # will drop ONLY the Users table (will need to drop Messages first)
+
+2. creating/dropping BOTH tables can be done through calling:
+e.g.
+> ./create_projecttables.sh  # will create BOTH Users, and Messages tables (that order)
+> ./destroy_projecttables.sh  # will drop BOTH Messages, and Users tables (that order)
+
+3. creating mock data for BOTH tables can be done through calling:
+> ./mock_data.sh
+
+#EOF

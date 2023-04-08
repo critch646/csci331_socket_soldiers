@@ -1,0 +1,47 @@
+
+MessageList {
+    background: $boost;
+    width: 100%;
+    margin: 1;
+    padding: 1;
+    dock: top;
+}
+
+MessageLabel {
+    margin: 1;
+    height: 1;
+}
+
+#sidebar {
+    width: 20%;
+    background: $boost;
+    dock: right;
+}
+
+MessageEntry {
+    background: $boost;
+    layout: horizontal;
+    width: 100%;
+    height: auto;
+    dock: bottom;
+    margin: 1;
+}
+
+MessageEntry #message-box {
+    height: 3;
+    dock: left;
+}
+
+MessageEntry #send-button {
+    dock: right;
+}
+
+UserList {
+    padding: 1;
+    border: solid black;
+}
+
+ChannelList {
+    padding: 1;
+    border: solid black;
+}
