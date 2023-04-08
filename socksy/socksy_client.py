@@ -3,6 +3,8 @@ Runs the chat window and connects to the main socket server (if it is running).
 Gets the hostname of the socket server from `socksy/client.env`.
 
 @name: socksy_server
+@author: Ethan Posner and Zeke Critchlow
+@Date: 2023/04/08
 """
 
 # Standard library imports

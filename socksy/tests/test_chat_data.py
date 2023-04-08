@@ -6,6 +6,8 @@ They ensure the classes hold the correct data/methods and that values
 can be grabbed and manipulated as expected.
 
 @name: test_chat_data
+@author: Ethan Posner
+@Date: 2023/04/08
 """
 
 # Third-party imports
