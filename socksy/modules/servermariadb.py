@@ -1,3 +1,11 @@
+"""
+Declares the DatabaseConnection object, and adds the necessary functionality for it to run globally--
+It also have the potential to be persistent during the runtime of the main for socksy_server.py
+
+@author: Brandon Stanton
+@date: April 8th, 2023
+"""
+
 # Module Imports
 import mysql.connector as mariadb
 import os
